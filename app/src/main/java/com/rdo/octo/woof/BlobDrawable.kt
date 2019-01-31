@@ -29,7 +29,7 @@ class BlobDrawable(private var paint: Paint, private val width: Int, private val
         val path = Path()
         path.moveTo(0f, 0f)
         val basXWithoutOffset = progressInPx / 2 * (1 + sin(((progress.toFloat() * PI / 1000) - (PI / 2)))).toFloat()
-        val baseX = maxOf(20f, basXWithoutOffset)
+        val baseX = maxOf(/*2*/0f, basXWithoutOffset)
         path.lineTo(baseX, 0f)
         for (i in 0..height) {
             val y = i.toFloat()

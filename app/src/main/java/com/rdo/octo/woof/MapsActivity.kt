@@ -7,10 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.BounceInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.SeekBar
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -35,6 +38,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private val initialSeekBarPosition: Int by lazy { seekBar2.y.toInt() }
 
     private var isOnSwipe = false
+    private var isOnPoiDetail = false
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
@@ -47,6 +51,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         stuffForBlob()
         stuffForSwipe()
+        initRecyclerView()
+    }
+
+    private fun initRecyclerView() {
+        val linearLayoutManager = LinearLayoutManager(this)
+        linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
+        recyclerViewPoi.layoutManager = linearLayoutManager
+        recyclerViewPoi.post {
+            recyclerViewPoi.translationY = recyclerViewPoi.height.toFloat()
+        }
     }
 
     private fun stuffForSwipe() {
@@ -106,9 +120,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             drawableBlob = BlobDrawable(paint, containerBlob.width, containerBlob.height, seekBar2.thumb.intrinsicWidth)
             blobView.background = drawableBlob
         }
-        pinkBackgroundContainer.post {
+        pinkBackgroundContainer.postDelayed({
             pinkBackgroundContainer.translationX = -1f * pinkBackgroundContainer.width
-        }
+        }, 50)
         seekBar2.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 drawableBlob.setProgress(progress)
@@ -148,11 +162,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onBackPressed() {
-        if (isOnSwipe) {
-            seekBar2.animate().alpha(1f).start()
-            moveBlobToZero(1000)
-        } else {
-            super.onBackPressed()
+        when {
+            isOnSwipe -> {
+                seekBar2.animate().alpha(1f).start()
+                moveBlobToZero(1000)
+            }
+            isOnPoiDetail -> hidePoiDetail()
+            else -> super.onBackPressed()
         }
     }
 
@@ -168,6 +184,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         isOnSwipe = false
     }
 
+    private fun hidePoiDetail() {
+        recyclerViewPoi.animate().translationY(recyclerViewPoi.height.toFloat() * 1.2f).setDuration(800).setInterpolator(AccelerateInterpolator()).start()
+        alphaView.animate().alpha(0f).setDuration(500).start()
+        alphaView.isClickable = false
+        isOnPoiDetail = false
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -179,11 +202,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        mMap.setOnMarkerClickListener {
+            recyclerViewPoi.adapter = PoiAdapter()
+            recyclerViewPoi.animate().translationY(0f).setDuration(800).setInterpolator(DecelerateInterpolator()).start()
+            alphaView.animate().alpha(0.3f).setDuration(500).start()
+            alphaView.isClickable = true
+            alphaView.setOnClickListener { hidePoiDetail() }
+            isOnPoiDetail = true
+            true
+        }
 
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(48.8630257, 2.3270115)
+        var sydney = LatLng(48.8630257, 2.3270115)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        val newLatLng = CameraUpdateFactory.newLatLngZoom(sydney, 13f)
+        sydney = LatLng(48.8637884, 2.3226724)
+        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        sydney = LatLng(48.845466, 2.316013)
+        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        val newLatLng = CameraUpdateFactory.newLatLngZoom(sydney, 15f)
         mMap.moveCamera(newLatLng)
     }
 }

@@ -34,6 +34,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val initialSeekBarPosition: Int by lazy { seekBar2.y.toInt() }
 
+    private var isOnSwipe = false
+
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         strokeWidth = 4f
@@ -96,7 +98,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun stuffForBlob() {
-        paint.color = ContextCompat.getColor(this, R.color.greyLight)
+        paint.color = ContextCompat.getColor(this, R.color.colorAccent)
         mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
@@ -128,47 +130,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         val value = it.animatedValue as Int
                         seekBar2.progress = value
                     }
-                    /*animator.addListener(object : Animator.AnimatorListener {
-                        override fun onAnimationRepeat(animation: Animator?) {
-                            // Do nothing
-                        }
-
-                        override fun onAnimationEnd(animation: Animator?) {
-                            seekBar2.postDelayed({
-                                val animatorFade = ObjectAnimator.ofFloat(0f, 2f)
-                                animatorFade.duration = 1000
-                                animatorFade.addUpdateListener {
-                                    val value = it.animatedValue as Float
-                                    if (value < 1f) {
-                                        containerBlob.alpha = 1f - value
-                                    } else {
-                                        containerBlob.alpha = value - 1f
-                                        seekBar2.progress = 0
-                                    }
-                                }
-                                animatorFade.start()
-                            }, 3000)
-                        }
-
-                        override fun onAnimationCancel(animation: Animator?) {
-                            // Do nothing
-                        }
-
-                        override fun onAnimationStart(animation: Animator?) {
-                            // Do nothing
-                        }
-
-                    })*/
                     animator.start()
+                    isOnSwipe = true
+                    seekBar2.animate().alpha(0f).start()
                 } else {
-                    val animator = ObjectAnimator.ofInt(progress, 0)
-                    animator.duration = 300
-                    animator.interpolator = BounceInterpolator()
-                    animator.addUpdateListener {
-                        val value = it.animatedValue as Int
-                        seekBar2.progress = value
-                    }
-                    animator.start()
+                    moveBlobToZero(progress)
                 }
             }
 
@@ -179,6 +145,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             seekBar2.translationY = newYpeak.toFloat() - initialSeekBarPosition - (seekBar2.height / 2)
             false
         }
+    }
+
+    override fun onBackPressed() {
+        if (isOnSwipe) {
+            seekBar2.animate().alpha(1f).start()
+            moveBlobToZero(1000)
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    private fun moveBlobToZero(progress: Int) {
+        val animator = ObjectAnimator.ofInt(progress, 0)
+        animator.duration = 300
+        animator.interpolator = BounceInterpolator()
+        animator.addUpdateListener {
+            val value = it.animatedValue as Int
+            seekBar2.progress = value
+        }
+        animator.start()
+        isOnSwipe = false
     }
 
     /**
@@ -194,8 +181,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
+        val sydney = LatLng(48.8630257, 2.3270115)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        val newLatLng = CameraUpdateFactory.newLatLngZoom(sydney, 13f)
+        mMap.moveCamera(newLatLng)
     }
 }

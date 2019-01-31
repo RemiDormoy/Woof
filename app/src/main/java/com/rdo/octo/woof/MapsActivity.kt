@@ -5,8 +5,11 @@ import android.animation.ObjectAnimator
 import android.graphics.Paint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.View
 import android.view.animation.BounceInterpolator
 import android.widget.SeekBar
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.ContextCompat
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -23,6 +26,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var drawableBlob: BlobDrawable
 
+    private var isImageTouched = false
+
     private lateinit var mapFragment: SupportMapFragment
 
     private var initialYPeak = -1
@@ -38,7 +43,60 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        paint.color = ContextCompat.getColor(this, R.color.colorAccent)
+        stuffForBlob()
+        stuffForSwipe()
+    }
+
+    private fun stuffForSwipe() {
+        motion.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> isImageTouched = true
+                MotionEvent.ACTION_UP -> isImageTouched = false
+            }
+            false
+        }
+        motion.setTransitionListener(object : MotionLayout.TransitionListener {
+            override fun onTransitionTrigger(p0: MotionLayout?, p1: Int, p2: Boolean, p3: Float) {
+                // Do nothing
+            }
+
+            override fun onTransitionStarted(p0: MotionLayout?, p1: Int, p2: Int) {
+                // Do nothing
+            }
+
+            override fun onTransitionChange(p0: MotionLayout, startSet: Int, endSet: Int, progress: Float) {
+                if (!isImageTouched) {
+                    if (progress < 0.55 && progress > 0.4) {
+                        p0.progress = 0.5f
+                    }
+                }
+            }
+
+            override fun onTransitionCompleted(p0: MotionLayout, constraintSet: Int) {
+                if (name1.text.toString() == "Paris") {
+                    picture1.setImageResource(R.drawable.sanfrancisco)
+                    name1.text = "New York"
+                    picture1.post {
+                        motion.progress = 0.5f
+                        name2.text = "Paris"
+                        picture2.setImageResource(R.drawable.paris)
+                    }
+                } else {
+                    name1.text = "Paris"
+                    picture1.setImageResource(R.drawable.paris)
+                    picture1.post {
+                        motion.progress = 0.5f
+                        name2.text = "New York"
+                        picture2.setImageResource(R.drawable.sanfrancisco)
+                    }
+                }
+            }
+
+        })
+    }
+
+    private fun stuffForBlob() {
+        paint.color = ContextCompat.getColor(this, R.color.greyLight)
         mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 

@@ -70,7 +70,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         val value = it.animatedValue as Int
                         seekBar2.progress = value
                     }
-                    animator.addListener(object : Animator.AnimatorListener {
+                    /*animator.addListener(object : Animator.AnimatorListener {
                         override fun onAnimationRepeat(animation: Animator?) {
                             // Do nothing
                         }
@@ -100,7 +100,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                             // Do nothing
                         }
 
-                    })
+                    })*/
                     animator.start()
                 } else {
                     val animator = ObjectAnimator.ofInt(progress, 0)

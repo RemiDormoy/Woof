@@ -61,8 +61,9 @@
 
         <androidx.constraintlayout.motion.widget.MotionLayout
                 android:layout_width="match_parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layoutDescription="@xml/swipe_scene"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 app:progress="0.5"
                 android:id="@+id/motion"
                 tools:context=".MainActivity">
@@ -183,6 +184,29 @@
                     android:fontFamily="@font/acme"/>
 
         </androidx.constraintlayout.motion.widget.MotionLayout>
+
+        <TextView
+                android:id="@+id/yolo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/motion"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textSize="18sp"
+                android:textAllCaps="true"
+                android:layout_marginTop="24dp"
+                android:fontFamily="@font/acme"
+                android:text="Fluffy's firends"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/friendsRecyclerView"
+                android:layout_width="match_parent"
+                app:layout_constraintTop_toBottomOf="@id/yolo"
+                android:layout_marginTop="24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_height="0dp">
+
+        </androidx.recyclerview.widget.RecyclerView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View

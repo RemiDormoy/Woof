@@ -1,6 +1,5 @@
 package com.rdo.octo.woof
 
-import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.graphics.LinearGradient
 import android.graphics.Paint
@@ -8,7 +7,6 @@ import android.graphics.Shader
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MotionEvent
-import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
@@ -53,13 +51,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         stuffForBlob()
         stuffForSwipe()
-        initRecyclerView()
+        initRecyclerViews()
     }
 
-    private fun initRecyclerView() {
+    private fun initRecyclerViews() {
         val linearLayoutManager = LinearLayoutManager(this)
         linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
         recyclerViewPoi.layoutManager = linearLayoutManager
+        val linearLayoutManagerVertical = LinearLayoutManager(this)
+        friendsRecyclerView.layoutManager = linearLayoutManagerVertical
+        friendsRecyclerView.alpha = 1f
         recyclerViewPoi.post {
             recyclerViewPoi.translationY = recyclerViewPoi.height.toFloat()
         }
@@ -109,6 +110,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
         })
+
     }
 
     private fun stuffForBlob() {
@@ -155,6 +157,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                     animator.start()
                     isOnSwipe = true
+                    friendsRecyclerView.adapter = FriendsAdapter()
+                    friendsRecyclerView.animate().alpha(1F).start()
                     seekBar2.animate().alpha(0f).start()
                 } else {
                     moveBlobToZero(progress)
@@ -173,6 +177,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onBackPressed() {
         when {
             isOnSwipe -> {
+                friendsRecyclerView.animate().alpha(0f).start()
                 seekBar2.animate().alpha(1f).start()
                 moveBlobToZero(1000)
             }

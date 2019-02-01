@@ -1,9 +1,9 @@
 package com.rdo.octo.woof
 
 import android.animation.ObjectAnimator
-import android.graphics.LinearGradient
-import android.graphics.Paint
-import android.graphics.Shader
+import android.content.Context
+import android.graphics.*
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MotionEvent
@@ -13,12 +13,14 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.SeekBar
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_maps.*
@@ -229,13 +231,31 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         // Add a marker in Sydney and move the camera
-        var sydney = LatLng(48.8630257, 2.3270115)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        var sydney = LatLng(48.8620528, 2.3287441)
+        mMap.addMarker(MarkerOptions().position(sydney).icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromVectorDrawable(R.drawable.ic_pin_beauty))))
         sydney = LatLng(48.8637884, 2.3226724)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        sydney = LatLng(48.845466, 2.316013)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        mMap.addMarker(MarkerOptions().position(sydney).icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromVectorDrawable(R.drawable.ic_pin_clean))))
+        sydney = LatLng(48.865466, 2.326013)
+        mMap.addMarker(MarkerOptions().position(sydney).icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromVectorDrawable(R.drawable.ic_pin_formation))))
+        sydney = LatLng(48.8599614, 2.3243727)
+        mMap.addMarker(MarkerOptions().position(sydney).icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromVectorDrawable(R.drawable.ic_pin_meeting))))
+        sydney = LatLng(48.8630257, 2.3270115)
+        mMap.addMarker(MarkerOptions().position(sydney).icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromVectorDrawable(R.drawable.ic_pin_run))))
         val newLatLng = CameraUpdateFactory.newLatLngZoom(sydney, 15f)
         mMap.moveCamera(newLatLng)
     }
+}
+
+fun Context.getBitmapFromVectorDrawable(drawableId: Int): Bitmap? {
+    var drawable = ContextCompat.getDrawable(this, drawableId) ?: return null
+
+    val bitmap = Bitmap.createBitmap(
+        Math.round(drawable.intrinsicWidth * 0.80f),
+        Math.round(drawable.intrinsicHeight * 0.80f),
+        Bitmap.Config.ARGB_8888) ?: return null
+    val canvas = Canvas(bitmap)
+    drawable.setBounds(0, 0, canvas.width, canvas.height)
+    drawable.draw(canvas)
+
+    return bitmap
 }

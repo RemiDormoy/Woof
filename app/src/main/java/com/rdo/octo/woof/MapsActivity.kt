@@ -161,6 +161,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     isOnSwipe = true
                     friendsRecyclerView.adapter = FriendsAdapter()
                     friendsRecyclerView.animate().alpha(1F).start()
+                    yoloyolo.animate().alpha(0F).start()
+                    yoloyoloyolo.animate().alpha(0F).start()
                     seekBar2.animate().alpha(0f).start()
                 } else {
                     moveBlobToZero(progress)
@@ -180,6 +182,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         when {
             isOnSwipe -> {
                 friendsRecyclerView.animate().alpha(0f).start()
+                yoloyolo.animate().alpha(1F).start()
+                yoloyoloyolo.animate().alpha(1F).start()
                 seekBar2.animate().alpha(1f).start()
                 moveBlobToZero(1000)
             }

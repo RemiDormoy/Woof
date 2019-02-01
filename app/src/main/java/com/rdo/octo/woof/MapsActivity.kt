@@ -2,7 +2,9 @@ package com.rdo.octo.woof
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
+import android.graphics.LinearGradient
 import android.graphics.Paint
+import android.graphics.Shader
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MotionEvent
@@ -89,21 +91,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             override fun onTransitionCompleted(p0: MotionLayout, constraintSet: Int) {
-                if (name1.text.toString() == "Paris") {
-                    picture1.setImageResource(R.drawable.sanfrancisco)
-                    name1.text = "New York"
+                if (name1.text.toString() == "Toby") {
+                    picture1.setImageResource(R.drawable.dog1)
+                    name1.text = "Milo"
                     picture1.post {
                         motion.progress = 0.5f
-                        name2.text = "Paris"
-                        picture2.setImageResource(R.drawable.paris)
+                        picture2.setImageResource(R.drawable.dog2)
                     }
                 } else {
-                    name1.text = "Paris"
-                    picture1.setImageResource(R.drawable.paris)
+                    name1.text = "Toby"
+                    picture1.setImageResource(R.drawable.dog2)
                     picture1.post {
                         motion.progress = 0.5f
-                        name2.text = "New York"
-                        picture2.setImageResource(R.drawable.sanfrancisco)
+                        picture2.setImageResource(R.drawable.dog1)
                     }
                 }
             }
@@ -117,6 +117,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         containerBlob.post {
+            paint.shader = LinearGradient(
+                0f,
+                0f,
+                containerBlob.width.toFloat(),
+                containerBlob.height.toFloat(),
+                ContextCompat.getColor(this, R.color.cornerTopGradient),
+                ContextCompat.getColor(this, R.color.cornerBottomGradient),
+                Shader.TileMode.MIRROR
+            )
             drawableBlob = BlobDrawable(paint, containerBlob.width, containerBlob.height, seekBar2.thumb.intrinsicWidth)
             blobView.background = drawableBlob
         }
@@ -185,7 +194,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun hidePoiDetail() {
-        recyclerViewPoi.animate().translationY(recyclerViewPoi.height.toFloat() * 1.2f).setDuration(800).setInterpolator(AccelerateInterpolator()).start()
+        recyclerViewPoi.animate().translationY(recyclerViewPoi.height.toFloat() * 1.2f).setDuration(800)
+            .setInterpolator(AccelerateInterpolator()).start()
         alphaView.animate().alpha(0f).setDuration(500).start()
         alphaView.isClickable = false
         isOnPoiDetail = false
@@ -204,7 +214,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
         mMap.setOnMarkerClickListener {
             recyclerViewPoi.adapter = PoiAdapter()
-            recyclerViewPoi.animate().translationY(0f).setDuration(800).setInterpolator(DecelerateInterpolator()).start()
+            recyclerViewPoi.animate().translationY(0f).setDuration(800).setInterpolator(DecelerateInterpolator())
+                .start()
             alphaView.animate().alpha(0.3f).setDuration(500).start()
             alphaView.isClickable = true
             alphaView.setOnClickListener { hidePoiDetail() }
